@@ -2,6 +2,8 @@ import os
 import discord
 from dotenv import load_dotenv
 
+#new comment
+
 load_dotenv()
 #load_dotenv('---.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
