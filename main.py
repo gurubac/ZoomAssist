@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 #new comment
 #another comment
+
 load_dotenv()
 #load_dotenv('---.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
