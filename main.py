@@ -34,6 +34,4 @@ async def on_message(message):
     elif message.content == ("!stop"):
         await client.close()
 
-
-
 client.run(TOKEN)
