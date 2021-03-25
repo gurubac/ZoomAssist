@@ -1,13 +1,15 @@
-import discord
 import os
-import requests
-import json
-import random
-from replit import db
-from keep_alive import keep_alive
+import discord
+from dotenv import load_dotenv
+
+load_dotenv()
+#load_dotenv('---.env')
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = discord.Client()
+#print(TOKEN)
+@client.event
+async def on_ready():
+    print(f'{client.user} has connected to Discord!')
 
-
-keep_alive()
-client.run(os.getenv('TOKEN'))
+client.run(TOKEN)
