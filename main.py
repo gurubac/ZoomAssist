@@ -10,6 +10,7 @@ import requests
 import json
 import http.client
 
+
 #new comment
 #another comment
 
@@ -18,7 +19,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 AUTH = os.getenv('AUTHORIZATION')
-DISCORDCHANNEL = os.getenv('DISCORD_CHANNEL')
+#DISCORDCHANNEL = os.getenv('DISCORD_CHANNEL')
 
 def myInfo():
     conn = http.client.HTTPSConnection("api.zoom.us")
@@ -32,8 +33,14 @@ def myInfo():
 
     res = conn.getresponse()
     data = res.read()
+    
+    y = data.decode("utf-8")
+    new = json.loads(y)
+    #print(type(y))
+    #print(y)
+    result = [new['personal_meeting_url'], new['first_name'], new['last_name'], new['created_at']]
+    return result
 
-    print(data.decode("utf-8"))
 
 def createMeeting():
     conn = http.client.HTTPSConnection("api.zoom.us")
@@ -46,21 +53,22 @@ def createMeeting():
         'content-type': "application/json"
         }
 
-    conn.request("POST", "/v2/users/me/meetings", payload, headers)
+    conn.request("POST", "/v2/users/me/", payload, headers)
 
     res = conn.getresponse()
     data = res.read()
 
     print(data.decode("utf-8"))
 
-createMeeting()
-#myInfo()
+#createMeeting()
+myInfo()
 
 #discord getting info
 client = discord.Client()
-channel = client.get_channel(DISCORDCHANNEL)
+#channel = client.get_channel(DISCORDCHANNEL)
 id = client.get_guild(GUILD)
-
+#print(channel)
+#print(id)
 
 @client.event
 async def on_ready():
@@ -73,12 +81,23 @@ async def on_ready():
     #     f'{guild.name}(id: {guild.id})\n'
     # )
 
+# @client.event
+# async def on_message(message):
+#     if message.content.find("!hello") != -1:
+#         await message.channel.send("Hi")
+#     elif message.content == ("!stop"):
+#         await client.close()
+
+collection = myInfo()
+print(collection)
+print(type(collection))
+
 @client.event
 async def on_message(message):
-    if message.content.find("!hello") != -1:
-        await message.channel.send("Hi")
-    elif message.content == ("!stop"):
-        await client.close()
-
+    if message.content.find("!new") != -1:
+        await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+        time.sleep(2)
+        await message.channel.send(collection[0])
+        
 
 client.run(TOKEN)
