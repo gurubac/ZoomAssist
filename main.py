@@ -12,7 +12,6 @@ import json
 import http.client
 import asyncio
 
-
 #bot = commands.Bot(command_prefix=".")
 
 load_dotenv()
@@ -77,7 +76,7 @@ id = bot.get_guild(GUILD)
 #print(id)
 
 @bot.command(
-    name="bruh"
+    aliases=["setschedule", "sets", "changeschedule", "changesched", "setSchedule", "setS"]
 )
 async def echo(ctx):
     await ctx.message.delete()
@@ -90,7 +89,7 @@ async def echo(ctx):
     try:
         msg = await bot.wait_for(
             "message",
-            timeout=60,
+            timeout=59,
             check= lambda message: message.author == ctx.author and message.channel == ctx.channel
         ) 
         if msg:
@@ -130,15 +129,14 @@ print(type(collection))
 @bot.event
 async def on_message(message):
     await bot.process_commands(message)
-    if message.content.find("!new") != -1:
+    if message.content.find("!meeting") != -1:
         await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
         time.sleep(2)
         await message.channel.send(collection[0])
     elif message.content == ("!stop"):
         await bot.close()
-    elif message.content.startswith("!test"):
-        await message.channel.send(sched)
-
+    elif message.content.startswith("!zoom s"):
+        await message.channel.send(f"Your scheduled Zoom meetings are on: " + sched)
 
 
 @bot.command()
