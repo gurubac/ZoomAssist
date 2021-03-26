@@ -10,12 +10,17 @@ import requests
 import json
 import http.client
 
+#new comment
+#another comment
+
 load_dotenv()
 #load_dotenv('---.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 AUTH = os.getenv('AUTHORIZATION')
 DISCORDCHANNEL = os.getenv('DISCORD_CHANNEL')
+
+isMeetingLive = None
 
 def myInfo():
     conn = http.client.HTTPSConnection("api.zoom.us")
@@ -50,6 +55,8 @@ def createMeeting():
 
     print(data.decode("utf-8"))
 
+    isMeetingLive = True
+
 createMeeting()
 #myInfo()
 
@@ -77,10 +84,10 @@ async def on_message(message):
     if message.content.startswith("!hello"):
         await message.channel.send("Hi " + str1 + "!")
     elif message.content.startswith('!zoom m'):
-        #if there are no meetings at specific time
+        if isMeetingLive == True:
+            await message.channel.send(f'A Zoom meeting is currently live!')
+        else:
             await message.channel.send(f'There are currently no live Zoom meetings.')
-        #if there are meetings at specific time
-            #await message.channel.send(f'A Zoom meeting is currently live!')
     elif message.content.startswith('!zoom s'):
         await message.channel.send(f'Your scheduled Zoom meetings are on ')
     elif message.content == ("!stop"):
