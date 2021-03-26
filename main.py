@@ -10,9 +10,6 @@ import requests
 import json
 import http.client
 
-#new comment
-#another comment
-
 load_dotenv()
 #load_dotenv('---.env')
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -79,7 +76,6 @@ async def on_message(message):
     str1 = str(message.author)
     if message.content.startswith("!hello"):
         await message.channel.send("Hi " + str1 + "!")
-        await client.clear()
     elif message.content.startswith('!zoom m'):
         #if there are no meetings at specific time
             await message.channel.send(f'There are currently no live Zoom meetings.')
