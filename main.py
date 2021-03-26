@@ -98,6 +98,8 @@ async def on_message(message):
         await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
         time.sleep(2)
         await message.channel.send(collection[0])
+    elif message.content == ("!stop"):
+        await client.close()
         
 
 client.run(TOKEN)
