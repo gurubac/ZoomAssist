@@ -12,6 +12,7 @@ import json
 import http.client
 import asyncio
 
+
 #bot = commands.Bot(command_prefix=".")
 
 load_dotenv()
@@ -96,6 +97,7 @@ async def echo(ctx):
             await sent.delete()
             await msg.delete()
             await ctx.send(msg.content)
+            global sched 
             sched = str(msg.content)
             return sched
     except asyncio.TimeoutError:
