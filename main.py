@@ -64,6 +64,10 @@ def createMeeting():
     print(data.decode("utf-8"))
 
 #createMeeting()
+
+
+    
+
 myInfo()
 
 #discord getting info
@@ -95,9 +99,12 @@ async def echo(ctx):
         if msg:
             await sent.delete()
             await msg.delete()
-            await ctx.send(msg.content)
+            await ctx.send(f"Updated current schedule to: " + msg.content)
             global sched 
             sched = str(msg.content)
+            f = open('schedule.txt', 'w')
+            f.write(sched)
+            f.close()
             return sched
     except asyncio.TimeoutError:
         await sent.delete()
@@ -136,7 +143,8 @@ async def on_message(message):
     elif message.content == ("!stop"):
         await bot.close()
     elif message.content.startswith("!zoom s"):
-        await message.channel.send(f"Your scheduled Zoom meetings are on: " + sched)
+        f = open('schedule.txt', 'r')
+        await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
 
 
 @bot.command()
