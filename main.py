@@ -1,5 +1,6 @@
 import os
 import discord
+from discord.ext import tasks, commands
 from dotenv import load_dotenv
 import subprocess
 import pyautogui
@@ -9,9 +10,9 @@ from datetime import datetime
 import requests
 import json
 import http.client
+import asyncio
 
-#new comment
-#another comment
+bot = commands.Bot(command_prefix=".")
 
 load_dotenv()
 #load_dotenv('---.env')
@@ -38,6 +39,8 @@ def myInfo():
     print(data.decode("utf-8"))
 
 def createMeeting():
+    isMeetingLive = True
+
     conn = http.client.HTTPSConnection("api.zoom.us")
 
     payload = "{\"topic\":\"string\",\"type\":\"integer\",\"start_time\":\"string [date-time]\",\"duration\":\"integer\",\"schedule_for\":\"string\",\"timezone\":\"string\",\"password\":\"string\",\"agenda\":\"string\",\"recurrence\":{\"type\":\"integer\",\"repeat_interval\":\"integer\",\"weekly_days\":\"string\",\"monthly_day\":\"integer\",\"monthly_week\":\"integer\",\"monthly_week_day\":\"integer\",\"end_times\":\"integer\",\"end_date_time\":\"string [date-time]\"},\"settings\":{\"host_video\":\"boolean\",\"participant_video\":\"boolean\",\"cn_meeting\":\"boolean\",\"in_meeting\":\"boolean\",\"join_before_host\":\"boolean\",\"mute_upon_entry\":\"boolean\",\"watermark\":\"boolean\",\"use_pmi\":\"boolean\",\"approval_type\":\"integer\",\"registration_type\":\"integer\",\"audio\":\"string\",\"auto_recording\":\"string\",\"enforce_login\":\"boolean\",\"enforce_login_domains\":\"string\",\"alternative_hosts\":\"string\",\"global_dial_in_countries\":[\"string\"],\"registrants_email_notification\":\"boolean\"}}"
@@ -55,7 +58,6 @@ def createMeeting():
 
     print(data.decode("utf-8"))
 
-    isMeetingLive = True
 
 createMeeting()
 #myInfo()
@@ -84,7 +86,7 @@ async def on_message(message):
     if message.content.startswith("!hello"):
         await message.channel.send("Hi " + str1 + "!")
     elif message.content.startswith('!zoom m'):
-        if isMeetingLive == True:
+        if (isMeetingLive == True):
             await message.channel.send(f'A Zoom meeting is currently live!')
         else:
             await message.channel.send(f'There are currently no live Zoom meetings.')
@@ -94,4 +96,38 @@ async def on_message(message):
         await client.close()
 
 
+@bot.command(
+    name="setschedule"
+)
+async def echo(ctx):
+    embed = discord.Embed(
+        title="Set the schedule for your Zoom meetings!",
+        description="This request will time out in 15 seconds!",
+    )
+    sent = await ctx.send(embed=embed)
+    def check(m):
+                return m.author.id==ctx.author.id
+    try:
+        input = await client.wait_for(
+            'message',
+            timeout=15,
+            check=check
+        )
+        if input:
+            await sent.delete()
+            await input.delete()
+            await ctx.send(input.content)
+            print(f'check')
+    except asyncio.TimeoutError:
+        await sent.delete()
+        await ctx.send("Cancelling due to timeout.", delete_after=10)
+
+
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send('Pong!')
+
+
+bot.run(TOKEN)
 client.run(TOKEN)
