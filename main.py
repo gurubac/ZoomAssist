@@ -120,7 +120,7 @@ async def echo(ctx):
             print(f'check')
     except asyncio.TimeoutError:
         await sent.delete()
-        await ctx.send("Cancelling due to timeout.", delete_after=10)
+        await ctx.send("Cancelling due to timeout.", delete_after=15)
 
 @bot.command()
 async def ping(ctx):
