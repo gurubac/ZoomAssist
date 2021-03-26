@@ -1,0 +1,1 @@
+This is where your zoom schedule would be stored when you run the set schedule command through the discord bot.
