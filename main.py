@@ -76,10 +76,10 @@ async def on_ready():
 @client.event
 async def on_message(message):
     #id = client.get_guild(GUILD)
-    if message.content.startswith("!hello") != -1:
-        str1 = str(message.author)
-        await message.channel.send("Hi " + str1)
-        return
+    str1 = str(message.author)
+    if message.content.startswith("!hello"):
+        await message.channel.send("Hi " + str1 + "!")
+        await client.clear()
     elif message.content.startswith('!zoom m'):
         #if there are no meetings at specific time
             await message.channel.send(f'There are currently no live Zoom meetings.')
