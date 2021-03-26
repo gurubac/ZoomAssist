@@ -12,8 +12,7 @@ import json
 import http.client
 import asyncio
 
-bot = commands.Bot(command_prefix=".")
-
+#bot = commands.Bot(command_prefix=".")
 
 load_dotenv()
 #load_dotenv('---.env')
@@ -68,15 +67,45 @@ def createMeeting():
 myInfo()
 
 #discord getting info
-client = discord.Client()
+#client = discord.Client()
+#bot = discord.Client()
+bot = commands.Bot(command_prefix=".")
 #channel = client.get_channel(DISCORDCHANNEL)
-id = client.get_guild(GUILD)
+id = bot.get_guild(GUILD)
 #print(channel)
 #print(id)
 
-@client.event
+@bot.command(
+    name="bruh"
+)
+async def echo(ctx):
+    await ctx.message.delete()
+    embed = discord.Embed(
+        title="Set the schedule for your Zoom meetings!\nMake sure to type in all courses and timeslots!\nEx: Math1A: MTWRF 9am-1030am, Math1B: TR 5pm-7pm",
+        description="This request will time out in 1 minute!",
+    )
+    sent = await ctx.send(embed=embed)
+
+    try:
+        msg = await bot.wait_for(
+            "message",
+            timeout=60,
+            check= lambda message: message.author == ctx.author and message.channel == ctx.channel
+        ) 
+        if msg:
+            await sent.delete()
+            await msg.delete()
+            await ctx.send(msg.content)
+            sched = str(msg.content)
+            return sched
+    except asyncio.TimeoutError:
+        await sent.delete()
+        await ctx.send("Cancelling due to timeout.", delete_after=15)
+
+
+@bot.event
 async def on_ready():
-    for guild in client.guilds:
+    for guild in bot.guilds:
         if guild.name == GUILD:
             break
 
@@ -96,56 +125,22 @@ collection = myInfo()
 print(collection)
 print(type(collection))
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.content.startswith("!new"):
+    await bot.process_commands(message)
+    if message.content.find("!new") != -1:
         await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
         time.sleep(2)
         await message.channel.send(collection[0])
-        #id = client.get_guild(GUILD)
-    elif message.content.startswith("!hello"):
-        str1 = str(message.author)
-        await message.channel.send("Hi " + str1 + "!")
-    elif message.content.startswith('!zoom m'):
-        if (isMeetingLive == True):
-            await message.channel.send(f'A Zoom meeting is currently live!')
-        else:
-            await message.channel.send(f'There are currently no live Zoom meetings.')
-    elif message.content.startswith('!zoom s'):
-        await message.channel.send(f'Your scheduled Zoom meetings are on ')
     elif message.content == ("!stop"):
-        await client.close()
+        await bot.close()
+    elif message.content.startswith("!test"):
+        await message.channel.send(sched)
 
-@bot.command(
-    name="setschedule"
-)
-async def echo(ctx):
-    await ctx.message.delete()
-    embed = discord.Embed(
-        title="Set the schedule for your Zoom meetings!\nMake sure to type in all courses and timeslots!\nEx: Math1A: MTWRF 9am-1030am, Math1B: TR 5pm-7pm",
-        description="This request will time out in 1 minute!",
-    )
-    sent = await ctx.send(embed=embed)
 
-    try:
-        msg = await bot.wait_for(
-            "message",
-            timeout=61,
-            check= lambda message: message.author == ctx.author and message.channel == ctx.channel
-        ) 
-        if msg:
-            await sent.delete()
-            await msg.delete()
-            await ctx.send(msg.content)
-            print(f'check')
-    except asyncio.TimeoutError:
-        await sent.delete()
-        await ctx.send("Cancelling due to timeout.", delete_after=15)
 
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong!')
 
-
 bot.run(TOKEN)
-client.run(TOKEN)
