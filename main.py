@@ -101,8 +101,8 @@ async def on_message(message):
 )
 async def echo(ctx):
     embed = discord.Embed(
-        title="Set the schedule for your Zoom meetings!",
-        description="This request will time out in 15 seconds!",
+        title="Set the schedule for your Zoom meetings!\nMake sure to type in all courses and timeslots!\nEx: Math1A: MTWRF 9am-1030am, Math1B: TR 5pm-7pm",
+        description="This request will time out in 1 minute!",
     )
     sent = await ctx.send(embed=embed)
     def check(m):
@@ -110,7 +110,7 @@ async def echo(ctx):
     try:
         input = await client.wait_for(
             'message',
-            timeout=15,
+            timeout=61,
             check=check
         )
         if input:
@@ -121,8 +121,6 @@ async def echo(ctx):
     except asyncio.TimeoutError:
         await sent.delete()
         await ctx.send("Cancelling due to timeout.", delete_after=10)
-
-
 
 @bot.command()
 async def ping(ctx):
