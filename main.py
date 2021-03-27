@@ -55,7 +55,7 @@ def createMeeting():
         'content-type': "application/json"
         }
 
-    conn.request("POST", "/v2/users/gbrbachchu@gmail.com/meetings", payload, headers)
+    conn.request("POST", "/v2/users/me/meetings", payload, headers)
 
     res = conn.getresponse()
     data = res.read()
