@@ -6,7 +6,7 @@ import subprocess
 import pyautogui
 import time
 import pandas as pd
-from datetime import datetime
+import datetime
 import requests
 import json
 import http.client
@@ -64,6 +64,9 @@ def createMeeting():
 
 #createMeeting()
 
+
+    
+
 myInfo()
 
 #discord getting info
@@ -95,7 +98,7 @@ async def echo(ctx):
         if msg:
             await sent.delete()
             await msg.delete()
-            await ctx.send(f"Updated current schedule to: " + msg.content)
+            await ctx.send(msg.content)
             global sched 
             sched = str(msg.content)
             f = open('schedule.txt', 'w')
@@ -129,22 +132,103 @@ collection = myInfo()
 print(collection)
 print(type(collection))
 
+# @bot.event
+# async def on_message(message):
+#     await bot.process_commands(message)
+#     if message.content.find("!meeting") != -1:
+#         await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+#         time.sleep(2)
+#         await message.channel.send(collection[0])
+#     elif message.content == ("!stop"):
+#         await bot.close()
+#     elif message.content.startswith("!zoom s"):
+#         f = open('schedule.txt', 'r')
+#         await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
+
+
+live = False
 @bot.event
 async def on_message(message):
+    global live
+    global e
+    global elapsedTime
+    global originalTimeInSec
     await bot.process_commands(message)
-    if message.content.find("!meeting") != -1:
-        await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
-        time.sleep(2)
-        await message.channel.send(collection[0])
-    elif message.content == ("!stop"):
-        await bot.close()
-    elif message.content.startswith("!zoom s"):
-        f = open('schedule.txt', 'r')
-        await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
+    
+    if live == False:
+        if message.content.find("!meeting") != -1:
+            await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+            time.sleep(2)
+            await message.channel.send(collection[0])
+            live = True
+            # start = datetime.datetime.now().time()
+            # print(start)
+            e = datetime.datetime.now()
+            #print ("The time is now: = %s:%s:%s" % (e.hour, e.minute, e.second))
+            #print(e.hour)
+            #convert original time to seconds
+            originalTimeInSec = (e.hour * 3600) + (e.minute * 60) + e.second
+        elif message.content == ("!status"):
+            await message.channel.send(f"There are no ongoing meetings.")
 
+    elif live == True:
+        # if message.content == ("!status"):
+        #     await message.channel.send(elapsedTime)
+            #await ctx.channel.send(elapsedTime)
+        # newHour = e.hour + 2
+        # newMinute = e.minute + 30
+        # newSecond = e.second + 30
+
+        global currentTimeInSec
+        current = datetime.datetime.now()
+        currentTimeInSec = (current.hour * 3600) + (current.minute * 60) + current.second
+
+        sec = (currentTimeInSec - originalTimeInSec)
+        ty_res = time.gmtime(sec)
+        res = time.strftime("%H:%M:%S",ty_res)
+
+        # if message.content == ("!status"):
+        #     await message.channel.send(f"There are no ongoing meetings.")
+
+        newTimeInSec = ((e.hour)*3600) + ((e.minute)*60) + (e.second+3)
+        if live:
+            if (currentTimeInSec > newTimeInSec):
+                live = False
+                # if message.content == ("!status"):
+                #     await message.channel.send(f"There are no currently meetings.")
+
+            elif (currentTimeInSec <= newTimeInSec):
+                
+                # elapsedHour = newHour - current.hour
+                # elapsedMinute = newMinute - current.minute
+                # elapsedSecond = newSecond - current.second
+
+                #convert current time to seconds
+                # currentTimeInSec = (current.hour * 3600) + (current.minute * 60) + current.second
+
+                # sec = (currentTimeInSec - originalTimeInSec)
+                # ty_res = time.gmtime(sec)
+                # res = time.strftime("%H:%M:%S",ty_res)
+
+                elapsedTime = "This meeting has been live for " + str(res)
+                #print(elapsedTime)
+                if message.content == ("!status"):
+                    if (currentTimeInSec <= newTimeInSec):
+                        await message.channel.send(elapsedTime)
+
+
+        
+                    
+                
+
+    # elif message.content == ("!stop"):
+    #     await bot.close()
+    # elif message.content.startswith("!zoom s"):
+    #     f = open('schedule.txt', 'r')
+    #     await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
 
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong!')
 
-bot.run(TOKEN)                                                                                                     
+bot.run(TOKEN)
