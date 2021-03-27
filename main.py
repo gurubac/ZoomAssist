@@ -45,7 +45,6 @@ def myInfo():
 
 
 def createMeeting():
-    isMeetingLive = True
     conn = http.client.HTTPSConnection("api.zoom.us")
 
     payload = "{\"topic\":\"string\",\"type\":\"integer\",\"start_time\":\"string [date-time]\",\"duration\":\"integer\",\"schedule_for\":\"string\",\"timezone\":\"string\",\"password\":\"string\",\"agenda\":\"string\",\"recurrence\":{\"type\":\"integer\",\"repeat_interval\":\"integer\",\"weekly_days\":\"string\",\"monthly_day\":\"integer\",\"monthly_week\":\"integer\",\"monthly_week_day\":\"integer\",\"end_times\":\"integer\",\"end_date_time\":\"string [date-time]\"},\"settings\":{\"host_video\":\"boolean\",\"participant_video\":\"boolean\",\"cn_meeting\":\"boolean\",\"in_meeting\":\"boolean\",\"join_before_host\":\"boolean\",\"mute_upon_entry\":\"boolean\",\"watermark\":\"boolean\",\"use_pmi\":\"boolean\",\"approval_type\":\"integer\",\"registration_type\":\"integer\",\"audio\":\"string\",\"auto_recording\":\"string\",\"enforce_login\":\"boolean\",\"enforce_login_domains\":\"string\",\"alternative_hosts\":\"string\",\"global_dial_in_countries\":[\"string\"],\"registrants_email_notification\":\"boolean\"}}"
@@ -153,6 +152,7 @@ async def on_message(message):
     global live
     global e
     global elapsedTime
+    global originalTimeInSec
     await bot.process_commands(message)
     
     if live == False:
@@ -164,30 +164,59 @@ async def on_message(message):
             # start = datetime.datetime.now().time()
             # print(start)
             e = datetime.datetime.now()
-            print ("The time is now: = %s:%s:%s" % (e.hour, e.minute, e.second))
-            print(e.hour)
+            #print ("The time is now: = %s:%s:%s" % (e.hour, e.minute, e.second))
+            #print(e.hour)
+            #convert original time to seconds
+            originalTimeInSec = (e.hour * 3600) + (e.minute * 60) + e.second
+        elif message.content == ("!status"):
+            await message.channel.send(f"There are no ongoing meetings.")
+
     elif live == True:
         # if message.content == ("!status"):
         #     await message.channel.send(elapsedTime)
             #await ctx.channel.send(elapsedTime)
-        newHour = e.hour + 2
-        newMinute = e.minute + 30
-        newSecond = e.second + 30
+        # newHour = e.hour + 2
+        # newMinute = e.minute + 30
+        # newSecond = e.second + 30
+
+        global currentTimeInSec
+        current = datetime.datetime.now()
+        currentTimeInSec = (current.hour * 3600) + (current.minute * 60) + current.second
+
+        sec = (currentTimeInSec - originalTimeInSec)
+        ty_res = time.gmtime(sec)
+        res = time.strftime("%H:%M:%S",ty_res)
+
+        # if message.content == ("!status"):
+        #     await message.channel.send(f"There are no ongoing meetings.")
+
+        newTimeInSec = ((e.hour)*3600) + ((e.minute)*60) + (e.second+3)
         if live:
-            if (e.hour > newHour) and (e.minute > newMinute) and (e.second > newSecond):
-                live = false
-            elif (e.hour <= newHour) and (e.minute <= newMinute) and (e.second <= newSecond):
-                current = datetime.datetime.now()
+            if (currentTimeInSec > newTimeInSec):
+                live = False
+                # if message.content == ("!status"):
+                #     await message.channel.send(f"There are no currently meetings.")
+
+            elif (currentTimeInSec <= newTimeInSec):
+                
                 # elapsedHour = newHour - current.hour
                 # elapsedMinute = newMinute - current.minute
                 # elapsedSecond = newSecond - current.second
-                elapsedHour = abs(current.hour - e.hour)
-                elapsedMinute = abs(current.minute - e.minute)
-                elapsedSecond = abs(current.second - e.second)
-                elapsedTime = "This meeting has been live for " + str(elapsedHour) + ":" + str(elapsedMinute).zfill(2) + ":" + str(elapsedSecond).zfill(2)
-                print(elapsedTime)
+
+                #convert current time to seconds
+                # currentTimeInSec = (current.hour * 3600) + (current.minute * 60) + current.second
+
+                # sec = (currentTimeInSec - originalTimeInSec)
+                # ty_res = time.gmtime(sec)
+                # res = time.strftime("%H:%M:%S",ty_res)
+
+                elapsedTime = "This meeting has been live for " + str(res)
+                #print(elapsedTime)
                 if message.content == ("!status"):
-                    await message.channel.send(elapsedTime)
+                    if (currentTimeInSec <= newTimeInSec):
+                        await message.channel.send(elapsedTime)
+
+
         
                     
                 
@@ -197,7 +226,6 @@ async def on_message(message):
     # elif message.content.startswith("!zoom s"):
     #     f = open('schedule.txt', 'r')
     #     await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
-
 
 @bot.command()
 async def ping(ctx):
