@@ -69,9 +69,6 @@ def createMeeting():
 
 #createMeeting()
 
-
-    
-
 #myInfo()
 
 #discord getting info
@@ -82,6 +79,7 @@ bot = commands.Bot(command_prefix=".")
 id = bot.get_guild(GUILD)
 #print(channel)
 #print(id)
+
 
 @bot.command(
     aliases=["setschedule", "sets", "changeschedule", "changesched", "setSchedule", "setS"]
@@ -113,6 +111,16 @@ async def echo(ctx):
     except asyncio.TimeoutError:
         await sent.delete()
         await ctx.send("Cancelling due to timeout.", delete_after=15)
+
+@bot.command()
+async def commandlist(ctx):
+    commandsList = '`\n!meeting  -  generates a Zoom meeting link\n!zoom schedule  -  displays schedule for meetings, can be tentative\n!status  -  checks status of zoom meetings`'
+    adminCommandsList = '`\n.setschedule - can modify schedule of Zoom meetings\n.TBA`'
+    if ctx.author.guild_permissions.administrator == False:
+        await ctx.channel.send("\nHere are the commands:\n"+"__NormalCommands__"+commandsList)
+    elif ctx.author.guild_permissions.administrator == True:
+        await ctx.channel.send("\nHere are the commands:\n"+"__NormalCommands__"+commandsList+"\n"+"__Admin Commands__"+adminCommandsList)
+
 
 
 @bot.event
@@ -162,7 +170,7 @@ async def on_message(message):
     await bot.process_commands(message)
     
     if live == False:
-        if message.content.find("!meeting") != -1:
+        if message.content == ("!meeting"):
             collection = createMeeting()
             #await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
             await message.channel.send("Hello! Please wait, your zoom meeting link is being generated!")
