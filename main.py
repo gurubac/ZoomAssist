@@ -163,10 +163,9 @@ async def on_message(message):
     
     if live == False:
         if message.content.find("!meeting") != -1:
-            #await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+            await message.channel.send("Hello! Please wait, your zoom meeting link is being generated!")
+            time.sleep(2)
             await message.channel.send(collection[0])
-            #time.sleep(2)
-            #await message.channel.send(collection[0])
             live = True
             # start = datetime.datetime.now().time()
             # print(start)
