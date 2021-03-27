@@ -47,27 +47,32 @@ def myInfo():
 def createMeeting():
     conn = http.client.HTTPSConnection("api.zoom.us")
 
-    payload = "{\"topic\":\"string\",\"type\":\"integer\",\"start_time\":\"string [date-time]\",\"duration\":\"integer\",\"schedule_for\":\"string\",\"timezone\":\"string\",\"password\":\"string\",\"agenda\":\"string\",\"recurrence\":{\"type\":\"integer\",\"repeat_interval\":\"integer\",\"weekly_days\":\"string\",\"monthly_day\":\"integer\",\"monthly_week\":\"integer\",\"monthly_week_day\":\"integer\",\"end_times\":\"integer\",\"end_date_time\":\"string [date-time]\"},\"settings\":{\"host_video\":\"boolean\",\"participant_video\":\"boolean\",\"cn_meeting\":\"boolean\",\"in_meeting\":\"boolean\",\"join_before_host\":\"boolean\",\"mute_upon_entry\":\"boolean\",\"watermark\":\"boolean\",\"use_pmi\":\"boolean\",\"approval_type\":\"integer\",\"registration_type\":\"integer\",\"audio\":\"string\",\"auto_recording\":\"string\",\"enforce_login\":\"boolean\",\"enforce_login_domains\":\"string\",\"alternative_hosts\":\"string\",\"global_dial_in_countries\":[\"string\"],\"registrants_email_notification\":\"boolean\"}}"
-    #payload = "{\"topic\":\"string\",\"type\":\"integer\",\"start_time\":\"string [date-time]\",\"duration\":\"integer\",\"schedule_for\":\"string\",\"timezone\":\"string\",\"password\":\"string\",\"agenda\":\"string\",\"recurrence\":{\"type\":\"integer\",\"repeat_interval\":\"integer\",\"weekly_days\":\"string\",\"monthly_day\":\"integer\",\"monthly_week\":\"integer\",\"monthly_week_day\":\"integer\",\"end_times\":\"integer\",\"end_date_time\":\"string [date-time]\"},\"settings\":{\"host_video\":\"boolean\",\"participant_video\":\"boolean\",\"cn_meeting\":\"boolean\",\"in_meeting\":\"boolean\",\"join_before_host\":\"boolean\",\"mute_upon_entry\":\"boolean\",\"watermark\":\"boolean\",\"use_pmi\":\"boolean\",\"approval_type\":\"integer\",\"registration_type\":\"integer\",\"audio\":\"string\",\"auto_recording\":\"string\",\"enforce_login\":\"boolean\",\"enforce_login_domains\":\"string\",\"alternative_hosts\":\"string\",\"global_dial_in_countries\":,\"registrants_email_notification\":\"boolean\"}}"
+    #payload = "{\"topic\":\"string\",\"type\":\"integer\",\"start_time\":\"string [date-time]\",\"duration\":\"integer\",\"schedule_for\":\"string\",\"timezone\":\"string\",\"password\":\"string\",\"agenda\":\"string\",\"recurrence\":{\"type\":\"integer\",\"repeat_interval\":\"integer\",\"weekly_days\":\"string\",\"monthly_day\":\"integer\",\"monthly_week\":\"integer\",\"monthly_week_day\":\"integer\",\"end_times\":\"integer\",\"end_date_time\":\"string [date-time]\"},\"settings\":{\"host_video\":\"boolean\",\"participant_video\":\"boolean\",\"cn_meeting\":\"boolean\",\"in_meeting\":\"boolean\",\"join_before_host\":\"boolean\",\"mute_upon_entry\":\"boolean\",\"watermark\":\"boolean\",\"use_pmi\":\"boolean\",\"approval_type\":\"integer\",\"registration_type\":\"integer\",\"audio\":\"string\",\"auto_recording\":\"string\",\"enforce_login\":\"boolean\",\"enforce_login_domains\":\"string\",\"alternative_hosts\":\"string\",\"global_dial_in_countries\":[\"string\"],\"registrants_email_notification\":\"boolean\"}}"
+    payload = "{\"topic\": \"test meeting\"}"
 
     headers = {
         'authorization': "Bearer " + AUTH,
         'content-type': "application/json"
         }
 
-    conn.request("POST", "/v2/users/me/", payload, headers)
+    conn.request("POST", "/v2/users/me/meetings", payload, headers)
 
     res = conn.getresponse()
     data = res.read()
+    # print(data.decode("utf-8"))
 
-    print(data.decode("utf-8"))
+    y = data.decode("utf-8")
+    print(y)
+    new = json.loads(y)
+    result = [new['join_url']]
+    return result
 
 #createMeeting()
 
 
     
 
-myInfo()
+#myInfo()
 
 #discord getting info
 #client = discord.Client()
@@ -128,9 +133,10 @@ async def on_ready():
 #     elif message.content == ("!stop"):
 #         await client.close()
 
-collection = myInfo()
-print(collection)
-print(type(collection))
+#collection = myInfo()
+#collection = createMeeting()
+#print(collection)
+#print(type(collection))
 
 # @bot.event
 # async def on_message(message):
@@ -157,9 +163,13 @@ async def on_message(message):
     
     if live == False:
         if message.content.find("!meeting") != -1:
-            await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+            collection = createMeeting()
+            #await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+            await message.channel.send("Hello! Please wait, your zoom meeting link is being generated!")
             time.sleep(2)
             await message.channel.send(collection[0])
+            #time.sleep(2)
+            #await message.channel.send(collection[0])
             live = True
             # start = datetime.datetime.now().time()
             # print(start)
@@ -216,16 +226,11 @@ async def on_message(message):
                     if (currentTimeInSec <= newTimeInSec):
                         await message.channel.send(elapsedTime)
 
-
-        
-                    
-                
-
-    # elif message.content == ("!stop"):
-    #     await bot.close()
-    # elif message.content.startswith("!zoom s"):
-    #     f = open('schedule.txt', 'r')
-    #     await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
+    if message.content == ("!stop"):
+        await bot.close()
+    elif message.content.startswith("!zoom s"):
+        f = open('schedule.txt', 'r')
+        await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
 
 @bot.command()
 async def ping(ctx):
