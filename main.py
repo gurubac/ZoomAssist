@@ -103,7 +103,7 @@ id = bot.get_guild(GUILD)
 async def help(ctx):
     embed = discord.Embed(title = "help", description = "Use .help <command> for extended information")
     embed.add_field(name = "Normal Commands", value = "meeting, status, schedule")
-    if ctx.message.author.server_permissions.administrator:
+    if ctx.message.author.guild_permissions.administrator:
         embed.add_field(name = "Administrator Commands", value = "setschedule, setTime")
     await ctx.send(embed = embed)
 
