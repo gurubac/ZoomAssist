@@ -3,11 +3,15 @@
 A discord bot that integrates Zoom setup through the Discord chat interface
 ## Installation Guide
 Install python3 onto your computer. Navigate to LAHACKS2021 Folder, and run main.py.
+
 To run, type `python3 main.py` in the terminal.
 ## Command List
 `.sets` to set class schedule
+
 `!status` to view the status of the meeting 
+
 `!zoomschedule` to view the current schedule 
+
 `.help` + meeting OR setschedule OR schedule OR status to get help on how to use any of the commands in the topic
 `
 ## Issues We Ran into
