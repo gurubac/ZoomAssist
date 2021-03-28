@@ -4,7 +4,6 @@
   <img src="https://raw.githubusercontent.com/gurubac/lahacks21/mahir/Transparent%20Logo.png" />
 </p>
 
-![Zoom Logo](https://raw.githubusercontent.com/gurubac/lahacks21/mahir/Transparent%20Logo.png)
 ## ZoomAssist
 A discord bot that integrates Zoom setup through the Discord chat interface
 ## Installation Guide
