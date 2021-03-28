@@ -7,7 +7,7 @@
 ## ZoomAssist
 A discord bot that integrates Zoom setup through the Discord chat interface
 ## Installation Guide
-Create a .env file located in the same LAHACKS2021 Folder, and set the environmental variables. THen create an app on zoom, and add your JWT token. 
+Create a .env file located in the same LAHACKS2021 Folder, and set the environmental variables. Then create an app on zoom, and add your JWT token. 
 Due to lack of hosting, we cannot provide our discord token, so you may create your own bot application on discord and set that token as an environmental variable using our program.
 
 Install python3 onto your computer. Navigate to LAHACKS2021 Folder, and run main.py.
