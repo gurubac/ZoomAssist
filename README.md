@@ -1,4 +1,5 @@
 # LA HACKS 2021
+[Zoom Logo] (/Users/mahir/Desktop/lahacks21/ZoomAssistLogo .png)
 ## ZoomAssist
 A discord bot that integrates Zoom setup through the Discord chat interface
 ## Installation Guide
