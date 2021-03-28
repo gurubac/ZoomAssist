@@ -92,26 +92,26 @@ async def help(ctx):
 
 @help.command()
 async def meeting(ctx):
-    embed = discord.Embed(title = "Meeting", description = "Generates a new Zoom meeting link")
-    embed.add_field(name = "**Syntax**", value = "!meeting")
+    embed = discord.Embed(title = "__Meeting__", description = "Generates a Zoom meeting link.", color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = "!meeting")
     await ctx.send(embed = embed)
 
 @help.command()
 async def status(ctx):
-    embed = discord.Embed(title = "Status", description = "Checks status of Zoom meeting")
-    embed.add_field(name = "**Syntax**", value = "!status")
+    embed = discord.Embed(title = "__Status__", description = "Checks status of Zoom meeting.",color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = "!status")
     await ctx.send(embed = embed)
 
 @help.command()
 async def schedule(ctx):
-    embed = discord.Embed(title = "Schedule", description = "Displays schedule for meetings")
-    embed.add_field(name = "**Syntax**", value = "!schedule")
+    embed = discord.Embed(title = "__Schedule__", description = "Displays schedule for meetings.",color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = "!schedule")
     await ctx.send(embed = embed)
 
 @help.command()
 async def setschedule(ctx):
-    embed = discord.Embed(title = "Set Schedule", description = "Modify planned schedule for Zoom meetings")
-    embed.add_field(name = "**Syntax**", value = ".setschedule <input>")
+    embed = discord.Embed(title = "__Set Schedule__", description = "Modify planned schedule for Zoom meetings.",color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = ".setschedule <input>")
     await ctx.send(embed = embed)
 
 
@@ -239,7 +239,7 @@ async def on_message(message):
                 # if message.content == ("!status"):
                 #     await message.channel.send(f"There are no currently meetings.")
 
-            elif (currentTimeInSec <= newTimeInSec):
+            elif (currentTimeInSec <= newTimeInSec):                                   
                 
                 # elapsedHour = newHour - current.hour
                 # elapsedMinute = newMinute - current.minute
