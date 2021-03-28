@@ -232,10 +232,15 @@ async def on_message(message):
         await bot.close()
     elif message.content.startswith("!zoom s"):
         #flag = True
+        specials = '"'
         with open('data.csv') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                #print(row[0])
+                row = [value.replace(specials, '') for value in row]
+                row = str(row)
+                writer = csv.writer(csvfile)
+                writer.writerow([row])
+                print(row[0])
                 if row[0] in message.content:
                     await message.channel.send(f"Here is your meeting details in the order of subject, date, start/end time!")
                     await message.channel.send(row)
