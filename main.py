@@ -75,10 +75,44 @@ def createMeeting():
 #client = discord.Client()
 #bot = discord.Client()
 bot = commands.Bot(command_prefix=".")
+bot.remove_command("help")
 #channel = client.get_channel(DISCORDCHANNEL)
 id = bot.get_guild(GUILD)
 #print(channel)
 #print(id)
+
+@bot.group(
+    invoke_without_command=True
+)
+async def help(ctx):
+    embed = discord.Embed(title = "help", description = "Use .help <command> for extended information")
+    embed.add_field(name = "Normal Commands", value = "meeting, status, schedule")
+    embed.add_field(name = "Administrator Commands", value = "setschedule")
+    await ctx.send(embed = embed)
+
+@help.command()
+async def meeting(ctx):
+    embed = discord.Embed(title = "Meeting", description = "Generates a new Zoom meeting link")
+    embed.add_field(name = "**Syntax**", value = "!meeting")
+    await ctx.send(embed = embed)
+
+@help.command()
+async def status(ctx):
+    embed = discord.Embed(title = "Status", description = "Checks status of Zoom meeting")
+    embed.add_field(name = "**Syntax**", value = "!status")
+    await ctx.send(embed = embed)
+
+@help.command()
+async def schedule(ctx):
+    embed = discord.Embed(title = "Schedule", description = "Displays schedule for meetings")
+    embed.add_field(name = "**Syntax**", value = "!schedule")
+    await ctx.send(embed = embed)
+
+@help.command()
+async def setschedule(ctx):
+    embed = discord.Embed(title = "Set Schedule", description = "Modify planned schedule for Zoom meetings")
+    embed.add_field(name = "**Syntax**", value = ".setschedule <input>")
+    await ctx.send(embed = embed)
 
 
 @bot.command(
@@ -111,16 +145,6 @@ async def echo(ctx):
     except asyncio.TimeoutError:
         await sent.delete()
         await ctx.send("Cancelling due to timeout.", delete_after=15)
-
-@bot.command()
-async def commandlist(ctx):
-    commandsList = '`\n!meeting  -  generates a Zoom meeting link\n!zoom schedule  -  displays schedule for meetings, can be tentative\n!status  -  checks status of zoom meetings`'
-    adminCommandsList = '`\n.setschedule - can modify schedule of Zoom meetings\n.TBA`'
-    if ctx.author.guild_permissions.administrator == False:
-        await ctx.channel.send("\nHere are the commands:\n"+"__NormalCommands__"+commandsList)
-    elif ctx.author.guild_permissions.administrator == True:
-        await ctx.channel.send("\nHere are the commands:\n"+"__NormalCommands__"+commandsList+"\n"+"__Admin Commands__"+adminCommandsList)
-
 
 
 @bot.event
