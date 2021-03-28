@@ -11,6 +11,7 @@ import requests
 import json
 import http.client
 import asyncio
+import csv
 
 #bot = commands.Bot(command_prefix=".")
 
@@ -105,10 +106,11 @@ async def echo(ctx):
             await msg.delete()
             await ctx.send(msg.content)
             global sched 
-            sched = str(msg.content)
-            f = open('schedule.txt', 'w')
-            f.write(sched)
-            f.close()
+            sched = (msg.content)
+            print(sched)
+            with open('data.csv', 'a') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow([sched])
             return sched
     except asyncio.TimeoutError:
         await sent.delete()
@@ -134,7 +136,7 @@ async def on_ready():
 #         await client.close()
 
 #collection = myInfo()
-collection = createMeeting()
+#collection = createMeeting()
 #print(collection)
 #print(type(collection))
 
@@ -163,9 +165,13 @@ async def on_message(message):
     
     if live == False:
         if message.content.find("!meeting") != -1:
-            await message.channel.send("Hello! Please wait, your zoom meeting link is being generated!")
+            collection = createMeeting()
+            #await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
+            await message.channel.send("Hello! Please wait, your Zoom meeting link is being generated!")
             time.sleep(2)
             await message.channel.send(collection[0])
+            #time.sleep(2)
+            #await message.channel.send(collection[0])
             live = True
             # start = datetime.datetime.now().time()
             # print(start)
@@ -225,8 +231,14 @@ async def on_message(message):
     if message.content == ("!stop"):
         await bot.close()
     elif message.content.startswith("!zoom s"):
-        f = open('schedule.txt', 'r')
-        await message.channel.send(f"Your scheduled Zoom meetings are on: " + f.read())
+        #flag = True
+        with open('data.csv') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                #print(row[0])
+                if row[0] in message.content:
+                    await message.channel.send(f"Here is your meeting details in the order of subject, date, start/end time!")
+                    await message.channel.send(row)
 
 @bot.command()
 async def ping(ctx):
