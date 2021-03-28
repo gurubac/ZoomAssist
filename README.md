@@ -9,7 +9,7 @@ Install python3 onto your computer. Navigate to LAHACKS2021 Folder, and run main
 
 To run, type `python3 main.py` in the terminal.
 ## Command List
-`.setschedule` OR `.sets` OR `.changeschedule` OR `.changesched` OR `.setSchedule` `.setS` to set the schedule for zoom meetings
+`.setschedule` OR `.sets` OR `.changeschedule` OR `.changesched` OR `.setSchedule` OR `.setS` to set the schedule for zoom meetings
 
 `!status` to view the status of the meeting 
 
