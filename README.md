@@ -1,4 +1,5 @@
-LA HACKS 2021
+##LA HACKS 2021
+
 Zoom Assist Discord Bot
 A highly modular approach to logging as well as automating
 zoom functionality and information through a discord bot
