@@ -12,7 +12,7 @@ import json
 import http.client
 import asyncio
 import csv
-writer = csv.writer(open("out.csv", "wb"), quoting=csv.QUOTE_NONE)
+# writer = csv.writer(open("out.csv", "wb"), quoting=csv.QUOTE_NONE)
 # reader = csv.reader(open("in.csv", "rb"), skipinitialspace=True)
 # writer.writerows(reader)
 
@@ -103,7 +103,8 @@ id = bot.get_guild(GUILD)
 async def help(ctx):
     embed = discord.Embed(title = "help", description = "Use .help <command> for extended information")
     embed.add_field(name = "Normal Commands", value = "meeting, status, schedule")
-    embed.add_field(name = "Administrator Commands", value = "setschedule")
+    if ctx.message.author.server_permissions.administrator:
+        embed.add_field(name = "Administrator Commands", value = "setschedule, setTime")
     await ctx.send(embed = embed)
 
 @help.command()
@@ -121,13 +122,19 @@ async def status(ctx):
 @help.command()
 async def schedule(ctx):
     embed = discord.Embed(title = "__Schedule__", description = "Displays schedule for meetings.",color = ctx.author.color)
-    embed.add_field(name = "**Syntax:**", value = "!schedule")
+    embed.add_field(name = "**Syntax:**", value = "!zoomschedule <subject>")
     await ctx.send(embed = embed)
 
 @help.command()
 async def setschedule(ctx):
-    embed = discord.Embed(title = "__Set Schedule__", description = "Modify planned schedule for Zoom meetings.",color = ctx.author.color)
-    embed.add_field(name = "**Syntax:**", value = ".setschedule <input>")
+    embed = discord.Embed(title = "__Set Schedule__", description = "For Admins only.\nModify planned schedule for Zoom meetings.",color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = ".setschedule")
+    await ctx.send(embed = embed)
+
+@help.command()
+async def settime(ctx):
+    embed = discord.Embed(title = "__Set Time__", description = "For Admins only.\nSet default meeting time for Zoom meetings.",color = ctx.author.color)
+    embed.add_field(name = "**Syntax:**", value = ".setTime")
     await ctx.send(embed = embed)
 
 @bot.command(
@@ -136,7 +143,7 @@ async def setschedule(ctx):
 async def echo(ctx):
     await ctx.message.delete()
     embed = discord.Embed(
-        title="Set the schedule for your Zoom meetings!\nMake sure to type in all courses and timeslots!\nEx: Math1A: MTWRF 9am-1030am, Math1B: TR 5pm-7pm",
+        title="Enter and add a schedule for your Zoom meetings!\nMake sure to the course and timeframes!\nEx): Math1A, MTWRF, 2:30, 3:30",
         description="This request will time out in 1 minute!",
     )
     sent = await ctx.send(embed=embed)
@@ -161,6 +168,38 @@ async def echo(ctx):
                 # writer.writerow([sched])
                 writer.writerows([rows])
             return sched
+    except asyncio.TimeoutError:
+        await sent.delete()
+        await ctx.send("Cancelling due to timeout.", delete_after=15)
+
+global default
+@bot.command()
+async def setTime(ctx):
+    await ctx.message.delete()
+    embed = discord.Embed(
+        title="Enter a default time frame for your Zoom meetings!\nPlease Use Hour and Minute Fornat!\nEx): 2:30, 0:50",
+        description="This request will time out in 20 seconds!",
+    )
+    sent = await ctx.send(embed=embed)
+
+    try:
+        msg = await bot.wait_for(
+            "message",
+            timeout=20,
+            check= lambda message: message.author == ctx.author and message.channel == ctx.channel
+        ) 
+        if msg:
+            await sent.delete()
+            await msg.delete()
+            await ctx.send("Set default meeting time to: " + msg.content)
+            # global defaultTime 
+            defaultTime = ((msg.content)+":00")
+            defaultTimeObj = datetime.datetime.strptime(defaultTime.strip(), '%H:%M:%S')
+            default = ((defaultTimeObj.hour*3600) + (defaultTimeObj.minute*60) + (defaultTimeObj.second))
+            saveTime = open('time.txt', 'w')
+            saveTime.write(str(default))
+            saveTime.close()
+            return default
     except asyncio.TimeoutError:
         await sent.delete()
         await ctx.send("Cancelling due to timeout.", delete_after=15)
@@ -210,15 +249,42 @@ async def on_message(message):
     global e
     global elapsedTime
     global originalTimeInSec
+    global meetingTime
+
     await bot.process_commands(message)
     
     if live == False:
-        if message.content.find("!meeting") != -1:
+        if message.content.startswith("!meeting"):
             collection = createMeeting()
             #await message.channel.send("Hello " + collection[1] + " " + collection[2] + ", here is your zoom link created at " + collection[3] + "!")
             await message.channel.send("Hello! Please wait, your Zoom meeting link is being generated!")
             time.sleep(2)
             await message.channel.send(collection[0])
+            with open('data.csv', 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                # included_cols = [3, 4]
+                timeFormat = '%H:%M:%S'
+                for row in reader:
+                    if row[0] in message.content:
+                        # content = list(row[i] for i in included_cols)
+                        # print (row[2],row[3])
+                        stringStartTime = str(row[2]+":00")
+                        stringEndTime = str(row[3]+":00")
+                        startTimeObj = datetime.datetime.strptime(stringStartTime.strip(), timeFormat)
+                        endTimeObj = datetime.datetime.strptime(stringEndTime.strip(), timeFormat)
+                        # print(startTimeObj)
+                        # print(type(stringStartTime))
+                        # print(endTimeObj)
+                        # print(type(stringEndTime))
+                        meetingTime = (((endTimeObj.hour - startTimeObj.hour)*3600)+((endTimeObj.minute-startTimeObj.minute)*60)+(endTimeObj.second-startTimeObj.second))
+                        # print(meetingTime)
+                    elif (row[0] not in message.content and message.content==("!meeting")):
+                        getTime = open('time.txt','r')
+                        temp = getTime.readline()
+                        meetingTime = int(temp)
+                        getTime.close()
+                        break
+                # print (meetingTime)
             #time.sleep(2)
             #await message.channel.send(collection[0])
             live = True
@@ -251,7 +317,13 @@ async def on_message(message):
         # if message.content == ("!status"):
         #     await message.channel.send(f"There are no ongoing meetings.")
 
-        newTimeInSec = ((e.hour)*3600) + ((e.minute)*60) + (e.second+3)
+        #Get Times From CSV File
+        # with open('data.csv', 'r',) as csvfile:
+        #     reader = reader(csvfile)
+        #     data = pd.read_csv(csvfile, skiprows=2, nrows=2)
+
+
+        newTimeInSec = ((e.hour)*3600) + ((e.minute)*60) + (e.second) + meetingTime
         if live:
             if (currentTimeInSec > newTimeInSec):
                 live = False
@@ -279,15 +351,14 @@ async def on_message(message):
 
     if message.content == ("!stop"):
         await bot.close()
-    elif message.content.startswith("!zoom s"):
+    elif message.content.startswith("!zoomschedule"):
         #flag = True
-        with open('data.csv') as csvfile:
+        with open('data.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                #print(row[0])
                 if row[0] in message.content:
                     await message.channel.send(f"Here is your meeting details in the order of subject, date, start/end time!")
-                    await message.channel.send(row)
+                    await message.channel.send(f'\t`Subject: {row[0]} - Days: {row[1]} - Start Time: {row[2]} - End Time: {row[3]} `')
 
 @bot.command()
 async def ping(ctx):
