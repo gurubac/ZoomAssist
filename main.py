@@ -110,7 +110,7 @@ async def help(ctx):
 @help.command()
 async def meeting(ctx):
     embed = discord.Embed(title = "__Meeting__", description = "Generates a Zoom meeting link.", color = ctx.author.color)
-    embed.add_field(name = "**Syntax:**", value = "!meeting")
+    embed.add_field(name = "**Syntax:**", value = "!meeting  -  Sets meeting time to default time.\n!meeting <subject>  -  Sets meeting time to subject's scheduled timeframe.")
     await ctx.send(embed = embed)
 
 @help.command()
@@ -122,7 +122,7 @@ async def status(ctx):
 @help.command()
 async def schedule(ctx):
     embed = discord.Embed(title = "__Schedule__", description = "Displays schedule for meetings.",color = ctx.author.color)
-    embed.add_field(name = "**Syntax:**", value = "!zoomschedule <subject>")
+    embed.add_field(name = "**Syntax:**", value = "!zoomschedule  - lists entire schedule.\n!zoomschedule <subject>  -  lists schedule for specified subject.")
     await ctx.send(embed = embed)
 
 @help.command()
@@ -138,13 +138,13 @@ async def settime(ctx):
     await ctx.send(embed = embed)
 
 @bot.command(
-    aliases=["setschedule", "sets", "changeschedule", "changesched", "setSchedule", "setS"]
+    aliases=["setschedule", "sets", "changeschedule", "changesched", "setSchedule", "setS"] 
 )
 async def echo(ctx):
     await ctx.message.delete()
     embed = discord.Embed(
-        title="Enter and add a schedule for your Zoom meetings!\nMake sure to the course and timeframes!\nEx): Math1A, MTWRF, 2:30, 3:30",
-        description="This request will time out in 1 minute!",
+        title="Enter and add a schedule for your Zoom meetings!\nMake sure to include the course and timeframes!\nEx): Math1A, MTWRF, 2:30, 3:30",
+        description="This request will __time out__ in 1 minute!",
     )
     sent = await ctx.send(embed=embed)
 
@@ -177,8 +177,8 @@ global default
 async def setTime(ctx):
     await ctx.message.delete()
     embed = discord.Embed(
-        title="Enter a default time frame for your Zoom meetings!\nPlease Use Hour and Minute Fornat!\nEx): 2:30, 0:50",
-        description="This request will time out in 20 seconds!",
+        title="Enter a **single** default time frame for your Zoom meetings!\nPlease Use Hour and Minute Fornat!\nEx): 2:30, 0:50, ,1:45, etc.",
+        description="This request will __time out__ in 20 seconds!",
     )
     sent = await ctx.send(embed=embed)
 
@@ -354,11 +354,16 @@ async def on_message(message):
     elif message.content.startswith("!zoomschedule"):
         #flag = True
         with open('data.csv', 'r') as csvfile:
-            reader = csv.reader(csvfile)
+            reader = csv.reader(csvfile, skipinitialspace=True,delimiter=',', quoting=csv.QUOTE_NONE)
             for row in reader:
                 if row[0] in message.content:
                     await message.channel.send(f"Here is your meeting details in the order of subject, date, start/end time!")
+                    await message.channel.send(f'\t`Subject: {row[0].strip()} - Days: {row[1].strip()} - Start Time: {row[2].strip()} - End Time: {row[3].strip()} `')
+                elif row[0] not in message.content and message.content==("!zoomschedule"):
                     await message.channel.send(f'\t`Subject: {row[0]} - Days: {row[1]} - Start Time: {row[2]} - End Time: {row[3]} `')
+                    for line in reader:
+                        await message.channel.send(f'\t`Subject: {line[0]} - Days: {line[1]} - Start Time: {line[2]} - End Time: {line[3]} `')
+                    
 
 @bot.command()
 async def ping(ctx):
