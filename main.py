@@ -196,7 +196,8 @@ async def setTime(ctx):
 async def dm(ctx, member:discord.Member, args):
     await ctx.message.delete()
     message = args
-    await member.send(f'{ctx.author.mention}: {message}')    
+    await member.send(f'{ctx.author.mention}: {message}')   
+    await ctx.author.send(f'Sent message to {member}.') 
 
 
 @bot.event
